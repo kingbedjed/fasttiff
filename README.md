@@ -1,2 +1,2 @@
-# lazy_tiff
-a lazy tiff reader
+# fasttiff
+a fast tiff reader
