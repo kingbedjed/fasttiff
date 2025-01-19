@@ -1,41 +1,41 @@
 from time import perf_counter
 from tifffile import TiffFile, imwrite, imread
 
-# im = imread('sample_cells.tif')
-# print(im.shape)
-# imwrite('simple_sample_cells.tif', im)
+im = imread('sample_cells.tif')
+print(im.shape)
+imwrite('simple_sample_cells.tif', im)
 
-# # Start the timer
-# start = perf_counter()
-# # read the full tiff file
-# with open('sample_cells.tif', 'rb') as f:
-#     data = f.read()
-# # print the size of the file
-# print(f'File size: {len(data)/1024/1024:.2f} MB')
-# # Stop the timer
-# end = perf_counter()
-# # Print the time taken
-# print(f'Time taken: {(end-start)*1000:.2f}ms')
-#
-# # Start the timer
-# start = perf_counter()
-# # read the full tiff file
-# tif = TiffFile('sample_cells.tif')
-# # print the size of the file
-# print(f'File size: {tif.filehandle.size/1024/1024:.2f} MB')
-# # Stop the timer
-# end = perf_counter()
-# # Print the time taken
-# print(f'Time taken: {(end-start)*1000:.2f}ms')
-#
-# # Start the timer
-# start = perf_counter()
-# # open the tiff file
-# fh = open('sample_cells.tif', 'rb')
-# # Stop the timer
-# end = perf_counter()
-# # Print the time taken
-# print(f'Time taken: {(end-start)*1000:.2f}ms')
+# Start the timer
+start = perf_counter()
+# read the full tiff file
+with open('sample_cells.tif', 'rb') as f:
+    data = f.read()
+# print the size of the file
+print(f'File size: {len(data)/1024/1024:.2f} MB')
+# Stop the timer
+end = perf_counter()
+# Print the time taken
+print(f'Time taken: {(end-start)*1000:.2f}ms')
+
+# Start the timer
+start = perf_counter()
+# read the full tiff file
+tif = TiffFile('sample_cells.tif')
+# print the size of the file
+print(f'File size: {tif.filehandle.size/1024/1024:.2f} MB')
+# Stop the timer
+end = perf_counter()
+# Print the time taken
+print(f'Time taken: {(end-start)*1000:.2f}ms')
+
+# Start the timer
+start = perf_counter()
+# open the tiff file
+fh = open('sample_cells.tif', 'rb')
+# Stop the timer
+end = perf_counter()
+# Print the time taken
+print(f'Time taken: {(end-start)*1000:.2f}ms')
 
 
 fh = open('simple_sample_cells.tif', 'rb')
