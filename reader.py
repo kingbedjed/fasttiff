@@ -55,12 +55,16 @@ def read_image_file_header(fh):
 
 def read_image_data(fh, strip_offsets, strip_byte_counts,
                     image_length, image_width, dtype=np.uint8):
-    image_data = []
+    image_data = np.empty(np.prod((image_length, image_width)), dtype=dtype)
+    start = 0
+    end = 0
     for i in range(len(strip_offsets)):
         fh.seek(strip_offsets[i])
-        image_data += fh.read(strip_byte_counts[i])
-    data_array = np.asarray(image_data, dtype=dtype)
-    return data_array.reshape((image_length, image_width))
+        end += strip_byte_counts[i]
+        image_data[start:end] = np.fromfile(fh, count=strip_byte_counts[i], offset=0, dtype=dtype)
+        start = end
+    image_data.shape = (image_length, image_width)
+    return image_data
 
 def imread(filename):
     with open(filename, 'rb') as fh:

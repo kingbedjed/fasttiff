@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/lazy_tiff.iml" filepath="$PROJECT_DIR$/.idea/lazy_tiff.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/fasttiff.iml" filepath="$PROJECT_DIR$/.idea/fasttiff.iml" />
     </modules>
   </component>
 </project>
