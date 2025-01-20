@@ -4,6 +4,7 @@ from consts import (
     data_type_map,
     data_type_byte_count_map,
 )
+from _imagecodecs import decoder_map
 import numpy as np
 
 def parse_tag_bytes(tag_bytes, byteorder_sym):
@@ -54,15 +55,20 @@ def read_image_file_header(fh):
     return byteorder_sym, first_IFD_offset
 
 def read_image_data(fh, strip_offsets, strip_byte_counts,
-                    image_length, image_width, dtype=np.uint8):
+                    image_length, image_width, decoder_func=None, dtype=np.uint8):
     image_data = np.empty(np.prod((image_length, image_width)), dtype=dtype)
+    buffer_data = np.empty(np.sum(strip_byte_counts), dtype=np.uint8)
     start = 0
     end = 0
     for i in range(len(strip_offsets)):
         fh.seek(strip_offsets[i])
         end += strip_byte_counts[i]
-        image_data[start:end] = np.fromfile(fh, count=strip_byte_counts[i], offset=0, dtype=dtype)
+        buffer_data[start:end] = np.fromfile(fh, count=strip_byte_counts[i], offset=0, dtype=np.uint8)
         start = end
+    if decoder_func is not None:
+        decoder_func(buffer_data, image_data)
+    else:
+        image_data = buffer_data
     image_data.shape = (image_length, image_width)
     return image_data
 
@@ -75,6 +81,7 @@ def imread(filename):
             strip_offsets=[tags['StripOffsets']['data_offset']],
             strip_byte_counts=[tags['StripByteCounts']['data_offset']],
             image_length=tags['ImageLength']['data_offset'],
-            image_width=tags['ImageWidth']['data_offset']
+            image_width=tags['ImageWidth']['data_offset'],
+            decoder_func=decoder_map.get(tags['Compression']['data_offset'], None),
         )
     return data

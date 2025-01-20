@@ -1,3 +1,4 @@
+
 def _packbits_decode(encoded, out):
     i = 0
     try:
@@ -14,4 +15,7 @@ def _packbits_decode(encoded, out):
                 i += n
     except TypeError:
         pass
-    return out
+
+decoder_map = {
+    32773: _packbits_decode,
+}
