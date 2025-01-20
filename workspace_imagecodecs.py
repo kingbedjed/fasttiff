@@ -1,5 +1,5 @@
 from reader import read_image_file_header, read_tags
-from _imagecodecs import packbits_decode
+from _imagecodecs import _packbits_decode
 from consts import compression_map
 import struct
 from tifffile import imwrite, imread
@@ -28,22 +28,25 @@ strip_byte_counts = struct.unpack(byteorder_sym + 'I'*tags['StripByteCounts']['d
 
 image_length = tags['ImageLength']['data_offset']
 image_width = tags['ImageWidth']['data_offset']
+rows_per_strip = tags['RowsPerStrip']['data_offset']
 
 compression_map[tags['Compression']['data_offset']]
 
 t_start = perf_counter()
-image_data = np.empty(np.prod((image_length, image_width)), dtype=np.uint8)
+# image_data = np.empty(np.prod((image_length, image_width)), dtype=np.uint8)
+buffer_data = np.empty(np.prod((image_length, image_width)), dtype=bytes)
 start = 0
 end = 0
-step_size = 7680
+bytes_per_strip = rows_per_strip * image_width
 for i in range(len(strip_offsets)):
     fh.seek(strip_offsets[i])
-    end += step_size
-    image_data[start:end] = np.frombuffer(
-        packbits_decode(fh.read(strip_byte_counts[i])),
+    end += rows_per_strip
+    _packbits_decode(fh.read(strip_byte_counts[i]), buffer_data[start:end])
+    start = end
+image_data = np.frombuffer(
+        buffer_data,
         dtype=np.uint8
     )
-    start = end
 len(image_data) / (image_length * image_width)
 # im = np.asarray(image_data, dtype=np.uint8)
 image_data.shape = (image_length, image_width)
@@ -51,11 +54,6 @@ t_end = perf_counter()
 print(f'My time taken: {(t_end-t_start)*1000:.2f}ms')
 
 
-#     _packbits_decode(fh.read(strip_byte_counts[i]), buffer_data[start:end])
-#     start = end
-# image_data = np.frombuffer(
-#         buffer_data,
-#         dtype=np.uint8
-#     )
+
 
 imwrite('/home/jed/sample_cells_from_file.tif', image_data)
