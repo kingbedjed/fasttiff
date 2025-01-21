@@ -58,4 +58,4 @@ print(f'My time taken: {(t_end-t_start)*1000:.2f}ms')
 
 
 
-imwrite('/home/jed/sample_cells_from_file.tif', image_data)
+imwrite('/home/jed/sample_cells_from_workspace_imagecodecs.tif', image_data)

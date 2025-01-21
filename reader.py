@@ -74,12 +74,25 @@ def read_image_data(fh, strip_offsets, strip_byte_counts,
 
 def imread(filename):
     with open(filename, 'rb') as fh:
+        file_size = fh.seek(0, 2)
         byteorder_sym, first_ifd_offset = read_image_file_header(fh)
         tags = read_tags(fh, first_ifd_offset, byteorder_sym)
+        # this is a bad way of getting offsets and counts but I dont know a better way yet...
+        fh.seek(tags['StripOffsets']['data_offset'])
+        strip_offsets = fh.read(tags['StripOffsets']['data_count'] * tags['StripOffsets']['data_type_byte_count'])
+        strip_offsets = struct.unpack(byteorder_sym + 'I' * tags['StripOffsets']['data_count'], strip_offsets)
+        fh.seek(tags['StripByteCounts']['data_offset'])
+        strip_byte_counts = fh.read(
+            tags['StripByteCounts']['data_count'] * tags['StripByteCounts']['data_type_byte_count'])
+        strip_byte_counts = struct.unpack(byteorder_sym + 'I' * tags['StripByteCounts']['data_count'],
+                                          strip_byte_counts)
+        if strip_offsets[-1] + strip_byte_counts[-1] > file_size:
+            strip_offsets = [tags['StripOffsets']['data_offset']]
+            strip_byte_counts = [tags['StripByteCounts']['data_offset']]
         data = read_image_data(
             fh,
-            strip_offsets=[tags['StripOffsets']['data_offset']],
-            strip_byte_counts=[tags['StripByteCounts']['data_offset']],
+            strip_offsets=strip_offsets,
+            strip_byte_counts=strip_byte_counts,
             image_length=tags['ImageLength']['data_offset'],
             image_width=tags['ImageWidth']['data_offset'],
             decoder_func=decoder_map.get(tags['Compression']['data_offset'], None),
